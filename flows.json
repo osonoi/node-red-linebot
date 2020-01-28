@@ -1,1 +1,142 @@
-[{"id":"a40c44ff.569158","type":"tab","label":"フロー 1","disabled":false,"info":""},{"id":"27265eea.6a9222","type":"http in","z":"a40c44ff.569158","name":"getmessage","url":"/line_bot","method":"post","upload":false,"swaggerDoc":"","x":130,"y":980,"wires":[["ae48dcfc.2682c","eb004563.ad75a8"]]},{"id":"f4848e2a.53c2e","type":"http request","z":"a40c44ff.569158","name":"returnmessage","method":"POST","ret":"obj","paytoqs":false,"url":"https://api.line.me/v2/bot/message/reply","tls":"","persist":false,"proxy":"","authType":"","x":750,"y":1180,"wires":[["262b9147.8d852e"]]},{"id":"ae48dcfc.2682c","type":"function","z":"a40c44ff.569158","name":"setMsg","func":"flow.set(\"replyToken\",msg.payload.events[0].replyToken);\n\nmsg.payload = msg.payload.events[0].message.text;\n\nreturn msg;","outputs":1,"noerr":0,"x":230,"y":1040,"wires":[["be2f0033.a8a94"]]},{"id":"eb004563.ad75a8","type":"debug","z":"a40c44ff.569158","name":"ユーザーからのメッセージ","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","x":360,"y":960,"wires":[]},{"id":"a599c122.ed4c9","type":"function","z":"a40c44ff.569158","name":"getAssistantMsg","func":"var auth = \"Bearer \" + \"FtEDVV+xJ9quJ3xycg3+Tc31n6H2wD0EHGGsvsVTfrdsm7/SCJ8fT+rKktuV0PQjcEj/mcAg8PdGvv+CGH+LgoGToHjup/udvtOW4TKdiHOEuj1nFtPYVgEvGY5nfD9X6PrnjSQZR0mRkmenlqtz6AdB04t89/1O/w1cDnyilFU=\"\nvar post_request = {\n    \"headers\": {\n        \"content-type\": \"application/json; charset=UTF-8\",\n        \"Authorization\": auth\n    },\n    \"payload\": {\n        \"replyToken\": flow.get(\"replyToken\"),\n        \"messages\": [\n            {\n                \"type\": \"text\",\n                \"text\": msg.payload.output.generic[0].text\n            }\n        ]\n    }\n};\n\nreturn post_request;\n","outputs":1,"noerr":0,"x":540,"y":1140,"wires":[["f4848e2a.53c2e"]]},{"id":"20ebcab6.24cb86","type":"debug","z":"a40c44ff.569158","name":"Assistantからのレスポンス","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","x":580,"y":1060,"wires":[]},{"id":"262b9147.8d852e","type":"debug","z":"a40c44ff.569158","name":"Line APIからの応答","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","x":820,"y":1120,"wires":[]},{"id":"be2f0033.a8a94","type":"watson-assistant-v2","z":"a40c44ff.569158","name":"","default-endpoint":true,"service-endpoint":"https://gateway.watsonplatform.net/assistant/api","assistant_id":"b252532e-bec5-47ca-8554-d93e293cfd9a","debug":false,"restart":false,"return_context":true,"alternate_intents":false,"multisession":true,"timeout":"","optout-learning":false,"x":360,"y":1120,"wires":[["20ebcab6.24cb86","a599c122.ed4c9"]]}]
+[
+    {
+        "id": "27265eea.6a9222",
+        "type": "http in",
+        "z": "a40c44ff.569158",
+        "name": "getmessage",
+        "url": "/line_bot",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 40,
+        "wires": [
+            [
+                "ae48dcfc.2682c",
+                "eb004563.ad75a8"
+            ]
+        ]
+    },
+    {
+        "id": "f4848e2a.53c2e",
+        "type": "http request",
+        "z": "a40c44ff.569158",
+        "name": "returnmessage",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": false,
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 750,
+        "y": 320,
+        "wires": [
+            [
+                "262b9147.8d852e"
+            ]
+        ]
+    },
+    {
+        "id": "ae48dcfc.2682c",
+        "type": "function",
+        "z": "a40c44ff.569158",
+        "name": "setMsg",
+        "func": "flow.set(\"replyToken\",msg.payload.events[0].replyToken);\n\nmsg.payload = msg.payload.events[0].message.text;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 230,
+        "y": 180,
+        "wires": [
+            [
+                "be2f0033.a8a94"
+            ]
+        ]
+    },
+    {
+        "id": "eb004563.ad75a8",
+        "type": "debug",
+        "z": "a40c44ff.569158",
+        "name": "ユーザーからのメッセージ",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 360,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "a599c122.ed4c9",
+        "type": "function",
+        "z": "a40c44ff.569158",
+        "name": "getAssistantMsg",
+        "func": "var auth = \"Bearer \" + \"Lineのキー\"\nvar post_request = {\n    \"headers\": {\n        \"content-type\": \"application/json; charset=UTF-8\",\n        \"Authorization\": auth\n    },\n    \"payload\": {\n        \"replyToken\": flow.get(\"replyToken\"),\n        \"messages\": [\n            {\n                \"type\": \"text\",\n                \"text\": msg.payload.output.generic[0].text\n            }\n        ]\n    }\n};\n\nreturn post_request;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 540,
+        "y": 280,
+        "wires": [
+            [
+                "f4848e2a.53c2e"
+            ]
+        ]
+    },
+    {
+        "id": "20ebcab6.24cb86",
+        "type": "debug",
+        "z": "a40c44ff.569158",
+        "name": "Assistantからのレスポンス",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 580,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "262b9147.8d852e",
+        "type": "debug",
+        "z": "a40c44ff.569158",
+        "name": "Line APIからの応答",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 820,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "be2f0033.a8a94",
+        "type": "watson-assistant-v2",
+        "z": "a40c44ff.569158",
+        "name": "",
+        "default-endpoint": true,
+        "service-endpoint": "https://gateway.watsonplatform.net/assistant/api",
+        "assistant_id": "",
+        "debug": false,
+        "restart": false,
+        "return_context": true,
+        "alternate_intents": false,
+        "multisession": true,
+        "timeout": "",
+        "optout-learning": false,
+        "x": 360,
+        "y": 260,
+        "wires": [
+            [
+                "20ebcab6.24cb86",
+                "a599c122.ed4c9"
+            ]
+        ]
+    }
+]
