@@ -1,0 +1,228 @@
+[
+    {
+        "id": "b5862cb4.7e383",
+        "type": "http in",
+        "z": "4151be3f.6f841",
+        "name": "getmessage",
+        "url": "/line_bot",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 40,
+        "wires": [
+            [
+                "594d703b.a4fa7",
+                "4dc8f3cb.154c8c"
+            ]
+        ]
+    },
+    {
+        "id": "f1b45d58.49d61",
+        "type": "http request",
+        "z": "4151be3f.6f841",
+        "name": "returnmessage",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": false,
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 750,
+        "y": 320,
+        "wires": [
+            [
+                "c8302f9e.85d83"
+            ]
+        ]
+    },
+    {
+        "id": "594d703b.a4fa7",
+        "type": "function",
+        "z": "4151be3f.6f841",
+        "name": "setMsg",
+        "func": "flow.set(\"replyToken\",msg.payload.events[0].replyToken);\nlet id = msg.payload.events[0].source.userId\nflow.set(\"id\",id)\nlet userInfo = {}\n\nmsg.payload = msg.payload.events[0].message.text;\n\nlet idList = global.keys()\nnode.warn(idList)\nmsg.params = {}\nif (idList.indexOf(id)>=0) {\n  node.warn('IDが登録済み')\n  msg.params.session_id = global.get(id)  \n} \n\n\nreturn msg;",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 230,
+        "y": 180,
+        "wires": [
+            [
+                "3526077f.450088"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4dc8f3cb.154c8c",
+        "type": "debug",
+        "z": "4151be3f.6f841",
+        "name": "ユーザーからのメッセージ",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 360,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "453c56a4.2e81a8",
+        "type": "function",
+        "z": "4151be3f.6f841",
+        "name": "getAssistantMsg",
+        "func": "\nvar auth = \"Bearer \" + \"ご自身のLineトークン\"\nglobal.set(flow.get(\"id\"),msg.payload.session_id)\n\nvar post_request = {\n    \"headers\": {\n        \"content-type\": \"application/json; charset=UTF-8\",\n        \"Authorization\": auth\n    },\n    \"payload\": {\n        \"replyToken\": flow.get(\"replyToken\"),\n        \"messages\": [\n            {\n                \"type\": \"text\",\n                \"text\": msg.payload.output.generic[0].text\n            }\n        ]\n    }\n};\n\nreturn post_request;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 540,
+        "y": 280,
+        "wires": [
+            [
+                "f1b45d58.49d61"
+            ]
+        ]
+    },
+    {
+        "id": "422b7e96.7d93a",
+        "type": "debug",
+        "z": "4151be3f.6f841",
+        "name": "Assistantからのレスポンス",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 580,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "c8302f9e.85d83",
+        "type": "debug",
+        "z": "4151be3f.6f841",
+        "name": "Line APIからの応答",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 820,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "3526077f.450088",
+        "type": "watson-assistant-v2",
+        "z": "4151be3f.6f841",
+        "name": "",
+        "default-endpoint": true,
+        "service-endpoint": "https://gateway.watsonplatform.net/assistant/api",
+        "assistant_id": "",
+        "debug": false,
+        "restart": false,
+        "return_context": true,
+        "alternate_intents": false,
+        "multisession": true,
+        "timeout": "",
+        "optout-learning": false,
+        "x": 360,
+        "y": 260,
+        "wires": [
+            [
+                "422b7e96.7d93a",
+                "453c56a4.2e81a8"
+            ]
+        ]
+    },
+    {
+        "id": "449f9aee.a38544",
+        "type": "catch",
+        "z": "4151be3f.6f841",
+        "name": "",
+        "scope": [
+            "3526077f.450088"
+        ],
+        "uncaught": false,
+        "x": 110,
+        "y": 360,
+        "wires": [
+            [
+                "d34da6fa.9d14d8"
+            ]
+        ]
+    },
+    {
+        "id": "d34da6fa.9d14d8",
+        "type": "function",
+        "z": "4151be3f.6f841",
+        "name": "deleteOutDatedSession",
+        "func": "global.set(flow.get('id'),undefined)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 290,
+        "y": 360,
+        "wires": [
+            [
+                "cf794588.f7d3d8"
+            ]
+        ]
+    },
+    {
+        "id": "cf794588.f7d3d8",
+        "type": "function",
+        "z": "4151be3f.6f841",
+        "name": "sedErrorMsg",
+        "func": "\nvar auth = \"Bearer \" + \"ご自身のライントークン\"\n// global.set(flow.get(\"id\"),msg.payload.session_id)\n\nvar post_request = {\n    \"headers\": {\n        \"content-type\": \"application/json; charset=UTF-8\",\n        \"Authorization\": auth\n    },\n    \"payload\": {\n        \"replyToken\": flow.get(\"replyToken\"),\n        \"messages\": [\n            {\n                \"type\": \"text\",\n                \"text\": \"ごめんなさい、もう一度お願いします\"\n            }\n        ]\n    }\n};\n\nreturn post_request;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 330,
+        "y": 440,
+        "wires": [
+            [
+                "f8a92763.afe4f8"
+            ]
+        ]
+    },
+    {
+        "id": "f8a92763.afe4f8",
+        "type": "http request",
+        "z": "4151be3f.6f841",
+        "name": "returnmessage",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": false,
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 520,
+        "y": 440,
+        "wires": [
+            [
+                "7fc15c03.58c974"
+            ]
+        ]
+    },
+    {
+        "id": "7fc15c03.58c974",
+        "type": "debug",
+        "z": "4151be3f.6f841",
+        "name": "Line APIからの応答",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 650,
+        "y": 520,
+        "wires": []
+    }
+]
